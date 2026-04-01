@@ -346,49 +346,13 @@
     }
     .portfolio-card .card-link:hover { gap: 0.7rem; }
 
-    /* SADA card — stars & stripes energy */
+    /* SADA card — photo background */
     .card-sada .card-bg {
-      background:
-        linear-gradient(135deg, #8b1a1a 0%, #1a1a2e 40%, #0a0a1a 100%);
+      background-image: url('https://wearesada.com/cdn/shop/files/SADA_BEST_PATRIOTIC-SHIRT_BRANDS_cdd23589-7945-438b-b631-b2c783fb3269.jpg?v=1769015751&width=1200');
+      background-size: cover;
+      background-position: center top;
     }
-    .card-sada .card-bg::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 18px,
-          rgba(201,168,76,0.06) 18px,
-          rgba(201,168,76,0.06) 19px
-        ),
-        repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 18px,
-          rgba(255,255,255,0.03) 18px,
-          rgba(255,255,255,0.03) 19px
-        );
-    }
-    .card-sada .card-bg::after {
-      content: '🦅';
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      font-size: 4rem;
-      opacity: 0.12;
-      filter: grayscale(1);
-      line-height: 1;
-    }
-    .card-sada .stars {
-      position: absolute;
-      top: 1.5rem;
-      left: 1.5rem;
-      font-size: 0.65rem;
-      color: rgba(255,255,255,0.15);
-      letter-spacing: 0.3em;
-    }
+    .card-sada .stars { display: none; }
 
     /* Coming soon card */
     .card-coming .card-bg {
@@ -615,9 +579,7 @@
 
         <!-- SADA -->
         <div class="portfolio-card card-sada">
-          <div class="card-bg">
-            <div class="stars">★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★</div>
-          </div>
+          <div class="card-bg"></div>
           <div class="card-content">
             <span class="tag">Apparel · Texas</span>
             <h3>Sons &amp; Daughters<br>of America</h3>
