@@ -492,10 +492,10 @@
     .cobra-scene {
       position: absolute;
       left: 0; right: 0;
-      bottom: -18px;
+      bottom: -20px;
       pointer-events: none;
       overflow: visible;
-      height: 36px;
+      height: 60px;
     }
     #snakeTrack {
       font-family: 'Courier New', monospace;
@@ -520,6 +520,24 @@
       position: absolute;
       bottom: 0;
       opacity: 0;
+      transition: bottom 0.2s ease, opacity 0.15s ease;
+    }
+    #snakeHead.sway {
+      animation: cobraSway 0.9s ease-in-out infinite alternate;
+    }
+    @keyframes cobraSway {
+      0%   { transform: translateX(-3px) rotate(-4deg); }
+      100% { transform: translateX(3px)  rotate(4deg);  }
+    }
+    #snakeTrack {
+      transition: opacity 0.3s ease;
+    }
+    #snakeTrack.pulse {
+      animation: snakePulse 0.4s ease-in-out infinite alternate;
+    }
+    @keyframes snakePulse {
+      from { opacity: 0.7; }
+      to   { opacity: 1;   }
     }
     .footer-logo, a.footer-logo {
       font-size: 0.95rem;
@@ -740,91 +758,111 @@
 <script src="https://tally.so/widgets/embed.js"></script>
 <script>
 (function(){
-  const wrap = document.getElementById('navLogo');
+  const wrap  = document.getElementById('navLogo');
   const track = document.getElementById('snakeTrack');
   const head  = document.getElementById('snakeHead');
   if (!wrap || !track || !head) return;
 
-  // Snake body chars that will be revealed left-to-right
-  const BODY    = '~-~-~-~-~-~-~-~-~-~-~-~';
-  const GLITCH  = '!@#$%^&*<>?/|\\~=-+';
-  const HEAD_FRAMES = [
-    '  ~S\n',
-    ' \\S/\n   |\n',
-    '  /\\\n (oo)\n  )(  ',
-    '  /\\\n (@@)\n  \\/  ',
-    '  /\\\n (88)\n  ||  ',
-    '  /\\\n (oo)\n  ||  ',
+  const BODY   = '~=~-~=~-~=~-~=~-~=~-~=~';
+  const GLITCH = '!@#$%*<>/|\\~=-+?^';
+
+  // Rising cobra frames: body visible underneath, head rising
+  const RISE = [
+    '  S',          // just tail poking up
+    ' (S)',          // body forming
+    ' /S\\',         // widening
+    ' /|\\',
+    '(| |)',         // hood spreading
+    '\\| |/',
+    ' \\|/',
+    ' (V)',          // fully open hood
+    '\\ | /',
+    ' (V)\n  |',
+    '\\(V)/\n  |',
+    ' /V\\\n  |',
+    '\\(V)/\n  |',
+    ' (V)\n  |',     // sway left
+    '/|V|\\\n  |',
+    '\\(V)/\n  |',   // sway right
+    ' (V)\n  |',
+    '\\(V)/\n  |',
+    ' (V)\n  |',
+    '\\(V)/\n  |',
   ];
 
   let running = false;
-  let timers  = [];
+  let timers = [];
+  let swayTimer = null;
 
-  function rnd(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+  function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function t(fn, ms){ const id = setTimeout(fn,ms); timers.push(id); return id; }
+  function clearAll(){ timers.forEach(clearTimeout); timers=[]; clearTimeout(swayTimer); }
 
-  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
-
-  function reset() {
-    clearTimers();
+  function reset(){
+    clearAll();
     running = false;
     track.textContent = '';
+    track.classList.remove('pulse');
     head.style.opacity = '0';
+    head.style.bottom = '0px';
+    head.classList.remove('sway');
     head.textContent = '';
   }
 
-  function run() {
-    if (running) return;
+  function run(){
+    if(running) return;
     running = true;
-    track.textContent = '';
-    head.style.opacity = '0';
-    head.textContent = '';
-
     const chars = BODY.split('');
     const revealed = [];
 
-    // Step 1: reveal each character with a glitch scramble
-    chars.forEach((finalChar, i) => {
-      let glitchCount = 0;
-      const maxGlitch = 3;
-      const baseDelay = i * 55;
-
-      function glitchTick() {
-        if (!running) return;
-        if (glitchCount < maxGlitch) {
-          const disp = [...revealed, rnd(GLITCH)].join('');
-          track.textContent = disp;
-          glitchCount++;
-          timers.push(setTimeout(glitchTick, 40));
+    // Slither: reveal chars with glitch scramble
+    chars.forEach((final, i) => {
+      let g = 0;
+      function tick(){
+        if(!running) return;
+        if(g++ < 3){
+          track.textContent = [...revealed, rnd(GLITCH)].join('');
+          t(tick, 35);
         } else {
-          revealed.push(finalChar);
+          revealed.push(final);
           track.textContent = revealed.join('');
-          // After last char, show head
-          if (i === chars.length - 1) {
-            timers.push(setTimeout(showHead, 180));
-          }
+          if(i === chars.length-1) t(riseUp, 200);
         }
       }
-
-      timers.push(setTimeout(glitchTick, baseDelay));
+      t(tick, i * 50);
     });
   }
 
-  function showHead() {
-    if (!running) return;
+  function riseUp(){
+    if(!running) return;
+    track.classList.add('pulse');
+    head.style.left = (track.offsetWidth + 2) + 'px';
+    head.style.opacity = '1';
+
     let f = 0;
-    function nextFrame() {
-      if (!running) return;
-      head.textContent = HEAD_FRAMES[f % HEAD_FRAMES.length];
-      // Position head at end of track
-      head.style.left = (track.offsetWidth + 4) + 'px';
-      head.style.bottom = f < HEAD_FRAMES.length - 1 ? '0px' : '14px';
-      head.style.opacity = '1';
+    function frame(){
+      if(!running) return;
+      head.textContent = RISE[f];
+      // Gradually rise bottom
+      const progress = f / (RISE.length - 1);
+      head.style.bottom = Math.round(progress * 28) + 'px';
       f++;
-      if (f < HEAD_FRAMES.length) {
-        timers.push(setTimeout(nextFrame, f < 2 ? 120 : 200));
+      if(f < RISE.length){
+        t(frame, f < 8 ? 60 : 100);
+      } else {
+        // Fully risen — start swaying
+        head.classList.add('sway');
+        // Occasional tongue flick
+        swayTimer = setInterval(() => {
+          if(!running){ clearInterval(swayTimer); return; }
+          head.textContent = '\\(V)/\n  |\n  Y';
+          swayTimer = setTimeout(() => {
+            if(running) head.textContent = '\\(V)/\n  |';
+          }, 150);
+        }, 900);
       }
     }
-    nextFrame();
+    frame();
   }
 
   wrap.addEventListener('mouseenter', run);
