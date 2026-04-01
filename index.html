@@ -47,6 +47,12 @@
       border-bottom: 1px solid var(--border);
     }
 
+    .nav-logo, a.nav-logo, a.footer-logo {
+      text-decoration: none;
+      cursor: pointer;
+      position: relative;
+      transition: letter-spacing 0.3s ease;
+    }
     .nav-logo, a.nav-logo {
       font-size: 1.1rem;
       font-weight: 700;
@@ -468,6 +474,18 @@
       justify-content: space-between;
     }
 
+    a.nav-logo:hover, a.footer-logo:hover {
+      text-decoration: none;
+      letter-spacing: 0.18em;
+    }
+    a.nav-logo span, a.footer-logo span {
+      display: inline-block;
+      transition: color 0.3s, transform 0.3s;
+    }
+    a.nav-logo:hover span, a.footer-logo:hover span {
+      color: var(--gold-light, #e8c97a);
+      transform: scale(1.15) rotate(-5deg);
+    }
     .footer-logo, a.footer-logo {
       font-size: 0.95rem;
       font-weight: 700;
