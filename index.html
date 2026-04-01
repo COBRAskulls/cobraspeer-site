@@ -494,19 +494,20 @@
     }
     .cobra-ascii {
       position: absolute;
-      left: -20px;
+      right: calc(100% + 10px);
       top: 50%;
       transform: translateY(-50%);
-      font-family: monospace;
-      font-size: 7px;
-      line-height: 1;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.3;
       white-space: pre;
       color: var(--gold);
       opacity: 0;
       pointer-events: none;
-      z-index: -1;
-      transition: opacity 0.3s ease;
-      text-shadow: 0 0 6px rgba(201,168,76,0.6);
+      transition: opacity 0.2s ease;
+      text-shadow: 0 0 8px rgba(201,168,76,1), 0 0 20px rgba(201,168,76,0.6), 0 0 40px rgba(201,168,76,0.3);
+      letter-spacing: 0.05em;
     }
     .cobra-wrap:hover .cobra-ascii {
       opacity: 1;
@@ -723,17 +724,16 @@
 <script src="https://tally.so/widgets/embed.js"></script>
 <script>
 (function() {
-  // Cobra ASCII frames — a cobra slithering/rearing
+  // Cobra ASCII frames — dramatic rearing cobra
   const frames = [
-    "  _\n~( }>\n  ~~",
-    "   _\n ~( }>\n  ~~",
-    "    _\n  ~( }>\n   ~",
-    "   __\n ~O{ }>\n  ~~~",
-    "  __\n~O{ }>\n ~~~",
-    " __\nO{ }>\n~~",
-    "  __\n~O{ }>\n  ~~~",
-    "   __\n  ~O{ }>\n   ~~",
-    "  _\n ~( }>\n  ~~",
+    "   ___\n  /   \\\n |o  o|\n  \\___/\n   | |\n~~~S~~~>",
+    "   ___\n  / . \\\n |O  O|\n  \\___/\n   )(\n~~S~~~>",
+    "   ___\n  /o_o\\\n |  * |\n  \\___/\n  /_\\\n~S~~~~>",
+    "   /\\\n  /  \\\n |@@|\n  \\__/\n  ))(\n~S~~~~~>",
+    "   /\\\n  (  )\n |@@|\n  \\__/\n  /|\\\n~S~~~~~~>",
+    "  /||\\\n  (!!)\n  \\__/\n   ))(\n ~S~~~~~>",
+    "  ///\\\n  (oo)\n  \\__/\n   ||\n ~S~~~~>",
+    "   __\n  /  \\\n |()|\n  \\__/\n  ))(\n~S~~~>",
   ];
 
   const el = document.getElementById('cobraAscii');
