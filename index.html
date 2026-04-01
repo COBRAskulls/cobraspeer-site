@@ -72,7 +72,7 @@
       text-transform: uppercase;
       transition: color 0.2s;
     }
-    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover { color: var(--gold); }
 
     /* HERO */
     .hero {
@@ -478,6 +478,8 @@
       text-decoration: none;
       letter-spacing: 0.18em;
     }
+    /* Prevent logo width change from shifting nav items */
+    a.nav-logo { display: inline-block; min-width: 140px; }
     a.nav-logo span, a.footer-logo span {
       display: inline-block;
       transition: color 0.3s, transform 0.3s;
