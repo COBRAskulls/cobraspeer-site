@@ -217,33 +217,77 @@
     }
 
     /* PILLARS */
-    .pillars { background: var(--dark); }
+    .pillars {
+      background: var(--dark);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Ambient glow behind the cards */
+    .pillars::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
 
     .pillars-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.5rem;
       margin-top: 3.5rem;
+      position: relative;
+      z-index: 1;
     }
 
     .pillar-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
       padding: 2rem;
-      transition: border-color 0.2s, transform 0.2s;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    /* Shiny top-left shine streak */
+    .pillar-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 60%; height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.35), rgba(255,255,255,0.0));
+      border-radius: 50%;
+    }
+
+    /* Subtle inner glow on hover */
+    .pillar-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      background: radial-gradient(circle at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .pillar-card:hover {
-      border-color: var(--gold);
-      transform: translateY(-3px);
+      transform: translateY(-5px);
+      border-color: rgba(201,168,76,0.4);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,168,76,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
     }
+    .pillar-card:hover::after { opacity: 1; }
 
     .pillar-num {
       font-size: 2.5rem;
       font-weight: 900;
       color: var(--gold);
-      opacity: 0.3;
+      opacity: 0.35;
       line-height: 1;
       margin-bottom: 0.75rem;
     }
