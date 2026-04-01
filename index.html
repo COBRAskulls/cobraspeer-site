@@ -265,49 +265,157 @@
       line-height: 1.7;
     }
 
+    /* NEW PORTFOLIO GRID */
     .portfolio-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 1.5rem;
     }
 
     .portfolio-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 2rem;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      transition: border-color 0.2s;
+      min-height: 380px;
+      transition: transform 0.25s, box-shadow 0.25s;
+      cursor: default;
     }
 
-    .portfolio-card:hover { border-color: var(--gold); }
+    .portfolio-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* Card visual backgrounds */
+    .portfolio-card .card-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .portfolio-card .card-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      flex: 1;
+      padding: 2rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+    }
 
     .portfolio-card .tag {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--gold);
+      margin-bottom: 0.5rem;
+      display: block;
     }
 
     .portfolio-card h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
+      font-size: 1.4rem;
+      font-weight: 800;
       color: var(--white);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
     }
 
     .portfolio-card p {
       font-size: 0.88rem;
-      color: var(--muted);
+      color: rgba(255,255,255,0.7);
       line-height: 1.6;
+      margin-bottom: 1.1rem;
     }
 
-    .coming-soon {
-      border-style: dashed;
-      opacity: 0.5;
+    .portfolio-card .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--gold);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: gap 0.2s;
     }
+    .portfolio-card .card-link:hover { gap: 0.7rem; }
+
+    /* SADA card — stars & stripes energy */
+    .card-sada .card-bg {
+      background:
+        linear-gradient(135deg, #8b1a1a 0%, #1a1a2e 40%, #0a0a1a 100%);
+    }
+    .card-sada .card-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 18px,
+          rgba(201,168,76,0.06) 18px,
+          rgba(201,168,76,0.06) 19px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 18px,
+          rgba(255,255,255,0.03) 18px,
+          rgba(255,255,255,0.03) 19px
+        );
+    }
+    .card-sada .card-bg::after {
+      content: '🦅';
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-size: 4rem;
+      opacity: 0.12;
+      filter: grayscale(1);
+      line-height: 1;
+    }
+    .card-sada .stars {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.15);
+      letter-spacing: 0.3em;
+    }
+
+    /* Coming soon card */
+    .card-coming .card-bg {
+      background: var(--card);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+    }
+    .card-coming .card-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 70%);
+    }
+    .card-coming .card-content {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: none;
+    }
+    .card-coming .coming-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+    .card-coming h3 { color: var(--muted); font-size: 1.1rem; }
+    .card-coming p { color: var(--muted); }
+    .card-coming .tag { color: var(--muted); }
 
     /* WHY */
     .why { background: var(--dark); }
@@ -504,17 +612,31 @@
       <h2>A Portfolio of Brands</h2>
       <p class="portfolio-intro">Each company within Cobra & Speer is built with intention — designed to perform, grow, and lead in its category. From emerging startups to established growth companies, our portfolio reflects a commitment to innovation and results.</p>
       <div class="portfolio-grid">
-        <div class="portfolio-card">
-          <span class="tag">Apparel</span>
-          <h3>SADA — Sons &amp; Daughters of America</h3>
-          <p>Patriotic apparel brand built for hardworking Americans. Bold, unapologetic designs made in Texas.</p>
-          <a href="https://wearesada.com" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--gold);font-size:0.82rem;font-weight:600;text-decoration:none;margin-top:0.5rem;">Visit Site →</a>
+
+        <!-- SADA -->
+        <div class="portfolio-card card-sada">
+          <div class="card-bg">
+            <div class="stars">★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★</div>
+          </div>
+          <div class="card-content">
+            <span class="tag">Apparel · Texas</span>
+            <h3>Sons &amp; Daughters<br>of America</h3>
+            <p>Patriotic apparel for hardworking Americans. Bold, unapologetic gear built in Texas — for people who live it, not just wear it.</p>
+            <a href="https://wearesada.com" target="_blank" rel="noopener" class="card-link">Visit wearesada.com →</a>
+          </div>
         </div>
-        <div class="portfolio-card coming-soon">
-          <span class="tag">Coming Soon</span>
-          <h3>More Coming Soon</h3>
-          <p>Additional portfolio companies will be announced soon.</p>
+
+        <!-- Coming Soon -->
+        <div class="portfolio-card card-coming">
+          <div class="card-bg"></div>
+          <div class="card-content">
+            <div class="coming-icon">🔒</div>
+            <span class="tag">Coming Soon</span>
+            <h3>Next Brand Dropping Soon</h3>
+            <p>More companies are being built and acquired. Stay tuned.</p>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
