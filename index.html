@@ -487,55 +487,39 @@
     }
 
     /* ASCII Cobra */
-    .cobra-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-    }
-    /* hide the old ascii span — replaced by snake scene */
+    .cobra-wrap { position: relative; display: inline-flex; align-items: center; }
     #cobraAscii { display: none; }
-
     .cobra-scene {
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -6px;
+      left: 0; right: 0;
+      bottom: -18px;
       pointer-events: none;
       overflow: visible;
+      height: 36px;
     }
-    .snake-body {
+    #snakeTrack {
       font-family: 'Courier New', monospace;
-      font-size: 10px;
+      font-size: 13px;
       font-weight: bold;
       white-space: nowrap;
       color: var(--gold);
       letter-spacing: 1px;
-      clip-path: inset(0 100% 0 0);
-      transition: clip-path 0.9s cubic-bezier(0.4,0,0.2,1);
-      text-shadow: 0 0 8px rgba(201,168,76,0.9), 0 0 16px rgba(201,168,76,0.5);
-    }
-    .snake-head {
+      text-shadow: 0 0 6px rgba(201,168,76,0.9), 0 0 18px rgba(201,168,76,0.5);
       position: absolute;
-      right: -4px;
       bottom: 0;
+      left: 0;
+    }
+    #snakeHead {
       font-family: 'Courier New', monospace;
-      font-size: 10px;
+      font-size: 13px;
       font-weight: bold;
       color: var(--gold);
       white-space: pre;
-      line-height: 1.1;
-      text-align: center;
+      line-height: 1;
+      text-shadow: 0 0 10px rgba(201,168,76,1), 0 0 24px rgba(201,168,76,0.7);
+      position: absolute;
+      bottom: 0;
       opacity: 0;
-      transform: translateY(4px);
-      transition: opacity 0.35s 0.85s ease, transform 0.35s 0.85s ease;
-      text-shadow: 0 0 10px rgba(201,168,76,1), 0 0 20px rgba(201,168,76,0.7);
-    }
-    .cobra-wrap:hover .snake-body {
-      clip-path: inset(0 0% 0 0);
-    }
-    .cobra-wrap:hover .snake-head {
-      opacity: 1;
-      transform: translateY(-14px);
     }
     .footer-logo, a.footer-logo {
       font-size: 0.95rem;
@@ -570,10 +554,8 @@
     <a href="#" class="nav-logo cobra-wrap" id="navLogo" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
       <span class="cobra-ascii" id="cobraAscii"></span>
       <div class="cobra-scene">
-        <span class="snake-body">~=~=~=~=~=~=~=~=~=~=~=~=</span>
-        <span class="snake-head"> ^^
-(oo)
- \/</span>
+        <span id="snakeTrack"></span>
+        <span id="snakeHead"></span>
       </div>
       Cobra <span>&</span> Speer
     </a>
@@ -757,7 +739,97 @@
 
 <script src="https://tally.so/widgets/embed.js"></script>
 <script>
-// Cobra animation is CSS-driven via clip-path + transform
+(function(){
+  const wrap = document.getElementById('navLogo');
+  const track = document.getElementById('snakeTrack');
+  const head  = document.getElementById('snakeHead');
+  if (!wrap || !track || !head) return;
+
+  // Snake body chars that will be revealed left-to-right
+  const BODY    = '~-~-~-~-~-~-~-~-~-~-~-~';
+  const GLITCH  = '!@#$%^&*<>?/|\\~=-+';
+  const HEAD_FRAMES = [
+    '  ~S\n',
+    ' \\S/\n   |\n',
+    '  /\\\n (oo)\n  )(  ',
+    '  /\\\n (@@)\n  \\/  ',
+    '  /\\\n (88)\n  ||  ',
+    '  /\\\n (oo)\n  ||  ',
+  ];
+
+  let running = false;
+  let timers  = [];
+
+  function rnd(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+  function reset() {
+    clearTimers();
+    running = false;
+    track.textContent = '';
+    head.style.opacity = '0';
+    head.textContent = '';
+  }
+
+  function run() {
+    if (running) return;
+    running = true;
+    track.textContent = '';
+    head.style.opacity = '0';
+    head.textContent = '';
+
+    const chars = BODY.split('');
+    const revealed = [];
+
+    // Step 1: reveal each character with a glitch scramble
+    chars.forEach((finalChar, i) => {
+      let glitchCount = 0;
+      const maxGlitch = 3;
+      const baseDelay = i * 55;
+
+      function glitchTick() {
+        if (!running) return;
+        if (glitchCount < maxGlitch) {
+          const disp = [...revealed, rnd(GLITCH)].join('');
+          track.textContent = disp;
+          glitchCount++;
+          timers.push(setTimeout(glitchTick, 40));
+        } else {
+          revealed.push(finalChar);
+          track.textContent = revealed.join('');
+          // After last char, show head
+          if (i === chars.length - 1) {
+            timers.push(setTimeout(showHead, 180));
+          }
+        }
+      }
+
+      timers.push(setTimeout(glitchTick, baseDelay));
+    });
+  }
+
+  function showHead() {
+    if (!running) return;
+    let f = 0;
+    function nextFrame() {
+      if (!running) return;
+      head.textContent = HEAD_FRAMES[f % HEAD_FRAMES.length];
+      // Position head at end of track
+      head.style.left = (track.offsetWidth + 4) + 'px';
+      head.style.bottom = f < HEAD_FRAMES.length - 1 ? '0px' : '14px';
+      head.style.opacity = '1';
+      f++;
+      if (f < HEAD_FRAMES.length) {
+        timers.push(setTimeout(nextFrame, f < 2 ? 120 : 200));
+      }
+    }
+    nextFrame();
+  }
+
+  wrap.addEventListener('mouseenter', run);
+  wrap.addEventListener('mouseleave', reset);
+})();
 </script>
 </body>
 </html>
