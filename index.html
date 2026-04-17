@@ -490,31 +490,48 @@
     .card-sada .stars { display: none; }
 
     /* Coming soon card */
-    .card-coming .card-bg {
-      background: var(--card);
-      border: 2px dashed var(--border);
+    /* Cortex card */
+    .card-cortex { overflow: visible; background: #0a0a0f; border-radius: 12px; }
+    .card-cortex .card-bg {
+      background: #0a0a0f;
       border-radius: 12px;
+      overflow: hidden;
+      clip-path: inset(0 round 12px);
     }
-    .card-coming .card-bg::before {
+    .card-cortex .card-bg::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(circle at 50% 50%, rgba(201,168,76,0.04) 0%, transparent 70%);
+      background: radial-gradient(ellipse at 30% 50%, rgba(124,58,237,0.18) 0%, transparent 65%),
+                  radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.1) 0%, transparent 50%);
     }
-    .card-coming .card-content {
+    .card-cortex .card-bg::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(139,92,246,0.5), transparent);
+    }
+    .card-cortex .tag {
+      color: #a78bfa;
+      background: none;
+      border: none;
+    }
+    .card-cortex h3 { color: #fff; }
+    .card-cortex p { color: #a1a1aa; }
+    .card-cortex .card-link { color: #a78bfa; }
+    .card-cortex .card-link:hover { color: #c4b5fd; }
+    .cortex-icon {
+      width: 48px;
+      height: 48px;
+      background: #7c3aed;
+      border-radius: 12px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      background: none;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 0 24px rgba(124,58,237,0.4);
     }
-    .card-coming .coming-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      opacity: 0.3;
-    }
-    .card-coming h3 { color: var(--muted); font-size: 1.1rem; }
-    .card-coming p { color: var(--muted); }
-    .card-coming .tag { color: var(--muted); }
 
     /* WHY */
     .why { background: var(--dark); }
@@ -737,14 +754,29 @@
           </div>
         </div>
 
-        <!-- Coming Soon -->
-        <div class="portfolio-card card-coming">
-          <div class="card-bg"></div>
+        <!-- Cortex -->
+        <div class="portfolio-card card-cortex" id="cortex-card">
+          <div class="card-bg">
+            <canvas id="cortex-canvas" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.7;pointer-events:none;"></canvas>
+          </div>
           <div class="card-content">
-            <div class="coming-icon">🔒</div>
-            <span class="tag">Coming Soon</span>
-            <h3>Next Brand Dropping Soon</h3>
-            <p>More companies are being built and partnered with. Stay tuned.</p>
+            <div class="cortex-icon">
+              <svg width="22" height="22" viewBox="0 0 16 16" fill="none">
+                <circle cx="8" cy="8" r="2" fill="white"/>
+                <circle cx="3" cy="3" r="1.5" fill="white" fill-opacity="0.7"/>
+                <circle cx="13" cy="3" r="1.5" fill="white" fill-opacity="0.7"/>
+                <circle cx="3" cy="13" r="1.5" fill="white" fill-opacity="0.7"/>
+                <circle cx="13" cy="13" r="1.5" fill="white" fill-opacity="0.7"/>
+                <line x1="8" y1="8" x2="3" y2="3" stroke="white" stroke-width="1" stroke-opacity="0.55"/>
+                <line x1="8" y1="8" x2="13" y2="3" stroke="white" stroke-width="1" stroke-opacity="0.55"/>
+                <line x1="8" y1="8" x2="3" y2="13" stroke="white" stroke-width="1" stroke-opacity="0.55"/>
+                <line x1="8" y1="8" x2="13" y2="13" stroke="white" stroke-width="1" stroke-opacity="0.55"/>
+              </svg>
+            </div>
+            <span class="tag">Internal Tool · Dashboard</span>
+            <h3>Cortex</h3>
+            <p>Command center for all active projects. Tracks deployments, commit streaks, and live status across every build in real time.</p>
+            <a href="https://dashboard.cobraspeer.com" target="_blank" rel="noopener" class="card-link">Open dashboard.cobraspeer.com →</a>
           </div>
         </div>
 
@@ -938,6 +970,98 @@
 
   wrap.addEventListener('mouseenter', run);
   wrap.addEventListener('mouseleave', reset);
+})();
+
+/* ── Cortex card: spotlight border + particle canvas ── */
+(function() {
+  const card = document.getElementById('cortex-card');
+  if (!card) return;
+
+  /* ── Spotlight border ── */
+  const borderWrap = document.createElement('div');
+  borderWrap.style.cssText = 'position:absolute;inset:-1px;border-radius:inherit;padding:2px;pointer-events:none;z-index:0;transition:opacity .3s;opacity:0;';
+  const borderInner = document.createElement('div');
+  borderInner.style.cssText = 'position:absolute;inset:1px;border-radius:inherit;background:#0a0a0f;';
+  borderWrap.appendChild(borderInner);
+  card.style.position = 'relative';
+  card.insertBefore(borderWrap, card.firstChild);
+
+  card.addEventListener('mousemove', function(e) {
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    borderWrap.style.background = 'radial-gradient(300px circle at ' + x + 'px ' + y + 'px, rgba(167,92,255,1), rgba(124,58,237,0.6) 40%, rgba(63,63,70,0.2) 70%, transparent 100%)';
+    borderWrap.style.opacity = '1';
+  });
+  card.addEventListener('mouseleave', function() {
+    borderWrap.style.opacity = '0';
+  });
+
+  /* ── Particle canvas ── */
+  const canvas = document.getElementById('cortex-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const COUNT = 28, GREEN = 4, MAX_D = 100, MR = 90, MAXSPD = 0.7;
+  let W, H, nodes = [], mouse = {x: -999, y: -999}, raf;
+
+  function makeNode(i) {
+    return { x: Math.random()*W, y: Math.random()*H,
+             vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4,
+             r: Math.random()*1.2+.8, op: Math.random()*.4+.2,
+             green: i < GREEN };
+  }
+
+  function resize() {
+    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    canvas.width = W; canvas.height = H;
+  }
+
+  function tick() {
+    ctx.clearRect(0,0,W,H);
+    nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0) { n.x=0; n.vx=Math.abs(n.vx); }
+      if (n.x > W) { n.x=W; n.vx=-Math.abs(n.vx); }
+      if (n.y < 0) { n.y=0; n.vy=Math.abs(n.vy); }
+      if (n.y > H) { n.y=H; n.vy=-Math.abs(n.vy); }
+      const dx=n.x-mouse.x, dy=n.y-mouse.y, d=Math.sqrt(dx*dx+dy*dy);
+      if (d < MR && d > 0) { const f=(MR-d)/MR; n.vx+=(dx/d)*f*.2; n.vy+=(dy/d)*f*.2; }
+      const spd=Math.sqrt(n.vx*n.vx+n.vy*n.vy);
+      if (spd > MAXSPD) { n.vx=(n.vx/spd)*MAXSPD; n.vy=(n.vy/spd)*MAXSPD; }
+      if (spd < .08) { n.vx+=(Math.random()-.5)*.04; n.vy+=(Math.random()-.5)*.04; }
+      n.x=Math.max(0,Math.min(W,n.x)); n.y=Math.max(0,Math.min(H,n.y));
+    });
+    for (let i=0;i<nodes.length;i++) for (let j=i+1;j<nodes.length;j++) {
+      const a=nodes[i],b=nodes[j], dx=a.x-b.x, dy=a.y-b.y, d=Math.sqrt(dx*dx+dy*dy);
+      if (d < MAX_D) {
+        const alpha=(1-d/MAX_D)*.28;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=(a.green&&b.green)?'rgba(52,211,153,'+alpha+')':'rgba(139,92,246,'+alpha+')';
+        ctx.lineWidth=.7; ctx.stroke();
+      }
+    }
+    nodes.forEach(n => {
+      const [r,g,b2]=n.green?[52,211,153]:[167,139,250];
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.fillStyle='rgba('+r+','+g+','+b2+','+n.op+')'; ctx.fill();
+    });
+    raf = requestAnimationFrame(tick);
+  }
+
+  function init() {
+    resize();
+    nodes = Array.from({length:COUNT},(_,i)=>makeNode(i));
+    cancelAnimationFrame(raf); tick();
+  }
+
+  canvas.addEventListener('mousemove', function(e) {
+    const r=canvas.getBoundingClientRect(); mouse={x:e.clientX-r.left,y:e.clientY-r.top};
+  });
+  canvas.addEventListener('mouseleave', function() { mouse={x:-999,y:-999}; });
+
+  window.addEventListener('resize', init);
+  init();
 })();
 </script>
 </body>
